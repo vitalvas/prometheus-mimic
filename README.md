@@ -17,3 +17,10 @@ services:
       - '--remoteWrite.flushInterval=30s'
       - '--httpListenAddr=:8429'
 ```
+
+### Prometheus
+
+```yaml
+remote_write:
+  - url: http://prometheus-mimic-gateway:8080/api/v1/write
+```
