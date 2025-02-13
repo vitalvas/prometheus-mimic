@@ -1,0 +1,25 @@
+linters:
+  enable:
+    - copyloopvar
+    - dogsled
+    - dupl
+    - gocritic
+    - gocyclo
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - prealloc
+    - revive
+    - staticcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unused
+  fast: false
+  disable-all: true
+linters-settings:
+  gosec:
+    excludes:
+      - G402
