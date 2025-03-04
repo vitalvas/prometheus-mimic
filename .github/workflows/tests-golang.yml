@@ -26,3 +26,10 @@ jobs:
 
       - name: Test Race
         run: go test -race -v ./...
+
+      - name: Publish coverage
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: ./coverage.txt
