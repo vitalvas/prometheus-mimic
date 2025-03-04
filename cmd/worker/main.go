@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/http/pprof"
 	"os"
 	"os/signal"
 	"slices"
@@ -18,6 +19,7 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/prometheus/prompb"
 )
 
@@ -48,6 +50,23 @@ func main() {
 	}
 
 	defer client.Close()
+
+	if endpoint, ok := os.LookupEnv("MIMIC_METRICS_LISTEN"); ok {
+		go func() {
+			router := http.NewServeMux()
+			router.Handle("/metrics", promhttp.Handler())
+
+			router.HandleFunc("/debug/pprof/", http.HandlerFunc(pprof.Index))
+			router.HandleFunc("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
+			router.HandleFunc("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
+			router.HandleFunc("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
+			router.HandleFunc("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
+
+			if err := http.ListenAndServe(endpoint, router); err != nil {
+				log.Fatalf("error starting metrics server: %v", err)
+			}
+		}()
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
@@ -93,7 +112,7 @@ func NewConsumer(writeEndpoint string) *Consumer {
 
 		batchLen:  100_000,
 		batchSize: 30 * 1024 * 1024, // 30MB, no more than maxInsertRequestSize (victoria-metrics)
-		batchTime: 5 * time.Second,
+		batchTime: time.Second,
 
 		httpClient: &http.Client{},
 	}
@@ -129,6 +148,7 @@ func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 	defer func() {
 		if len(messages) > 0 {
 			consumer.processMessages(messages)
+			messages = nil
 		}
 	}()
 
@@ -146,7 +166,7 @@ func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 
 			if len(messages) >= consumer.batchLen || messagesSize >= consumer.batchSize {
 				consumer.processMessages(messages)
-				messages = make([]*sarama.ConsumerMessage, 0, consumer.batchSize*2)
+				messages = nil
 				messagesSize = 0
 
 				batchTicker.Reset(consumer.batchTime)
@@ -155,7 +175,7 @@ func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 		case <-batchTicker.C:
 			if len(messages) > 0 {
 				consumer.processMessages(messages)
-				messages = make([]*sarama.ConsumerMessage, 0, consumer.batchSize*2)
+				messages = nil
 				messagesSize = 0
 			}
 		}
