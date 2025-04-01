@@ -6,9 +6,9 @@ require (
 	github.com/IBM/sarama v1.45.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/gogo/protobuf v1.3.2
-	github.com/golang/snappy v0.0.4
+	github.com/golang/snappy v1.0.0
 	github.com/klauspost/compress v1.18.0
-	github.com/prometheus/client_golang v1.21.0
+	github.com/prometheus/client_golang v1.21.1
 	github.com/prometheus/prometheus v0.302.1
 	github.com/stretchr/testify v1.10.0
 	gopkg.in/yaml.v3 v3.0.1
