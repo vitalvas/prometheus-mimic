@@ -8,8 +8,8 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v1.0.0
 	github.com/klauspost/compress v1.18.0
-	github.com/prometheus/client_golang v1.21.1
-	github.com/prometheus/prometheus v0.302.1
+	github.com/prometheus/client_golang v1.22.0
+	github.com/prometheus/prometheus v0.303.0
 	github.com/stretchr/testify v1.10.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -61,6 +61,6 @@ require (
 	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 )
